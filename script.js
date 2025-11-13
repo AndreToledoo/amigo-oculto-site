@@ -1,134 +1,124 @@
-const q = id => document.getElementById(id);
+// -----------------------------
+// UTILIDADES
+// -----------------------------
+function uid() {
+  return Math.random().toString(36).substring(2, 10);
+}
 
-let names = [];
-let mapping = {};
-let wishlists = {};
+// Simulação de busca MUITO MELHORADA
+async function smartSearch(query) {
+  const keywords = query.toLowerCase().split(" ");
 
-function addName() {
-    const name = q("nameInput").value.trim();
-    if (!name) return;
+  const items = [
+    { title: "Perfume Importado", img:"https://picsum.photos/250?1", link:"#", tags:["perfume","cheiro","importado"] },
+    { title: "Fone Bluetooth", img:"https://picsum.photos/250?2", link:"#", tags:["fone","audio","musica"] },
+    { title: "Camisa Premium", img:"https://picsum.photos/250?3", link:"#", tags:["camisa","roupa","moda"] },
+    { title: "Relógio Digital", img:"https://picsum.photos/250?4", link:"#", tags:["relogio","acessório"] },
+    { title: "Air Fryer Smart", img:"https://picsum.photos/250?5", link:"#", tags:["cozinha","airfryer"] },
+  ];
 
-    names.push(name);
+  // Rankeamento simples por relevância
+  return items
+    .map(i => {
+      let score = 0;
+      keywords.forEach(k => {
+        if (i.title.toLowerCase().includes(k)) score += 2;
+        if (i.tags.includes(k)) score += 3;
+      });
+      return { ...i, score };
+    })
+    .filter(i => i.score > 0)
+    .sort((a,b) => b.score - a.score);
+}
+
+// -----------------------------
+// CRIAR GRUPO E LINKS
+// -----------------------------
+document.getElementById("btnCreate").onclick = () => {
+  const names = document.getElementById("participants").value
+    .split("\n")
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+
+  const list = document.getElementById("tokenList");
+  list.innerHTML = "";
+
+  names.forEach(name => {
+    const token = uid();
     const li = document.createElement("li");
-    li.textContent = name;
-    q("nameList").appendChild(li);
+    li.innerHTML = `
+      <strong>${name}</strong>
+      <span>${location.href}?u=${token}</span>
+    `;
+    list.appendChild(li);
+  });
 
-    q("nameInput").value = "";
-}
+  document.getElementById("linksArea").classList.remove("hide");
+  document.getElementById("panelList").classList.remove("hide");
 
-function startDraw() {
-    if (names.length < 2) return alert("Adicione pelo menos 2 pessoas.");
-
-    const shuffled = [...names].sort(() => Math.random() - 0.5);
-
-    mapping = {};
-    wishlists = {};
-
-    shuffled.forEach((name, i) => {
-        mapping[name] = shuffled[(i + 1) % shuffled.length];
-        wishlists[name] = [];
-    });
-
-    localStorage.setItem("lastGroup", JSON.stringify({ mapping, names }));
-
-    setupPanels(names, mapping);
-
-    q("setup").classList.add("hide");
-    q("panelList").classList.remove("hide");
-}
-
-function setupPanels(names, mapping) {
-    const container = q("peopleButtons");
-    const panels = q("panels");
-
-    container.innerHTML = "";
-    panels.innerHTML = "";
-
-    names.forEach(name => {
-        const btn = document.createElement("button");
-        btn.className = "person-btn";
-        btn.textContent = name;
-        btn.onclick = () => openPanel(name);
-        container.appendChild(btn);
-
-        const panel = document.createElement("div");
-        panel.className = "panel";
-        panel.id = "panel_" + name;
-
-        panel.innerHTML = `
-            <h2>${name}</h2>
-            <p>Você tirou: <strong>${mapping[name]}</strong></p>
-
-            <h3>Wishlist</h3>
-
-            <input id="wish_${name}" placeholder="Buscar presentes...">
-            <button onclick="searchGifts('${name}')">Buscar</button>
-
-            <div id="wishlist_${name}"></div>
-        `;
-
-        panels.appendChild(panel);
-    });
-}
-
-function openPanel(name) {
-    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-    q("panel_" + name).classList.add("active");
-}
-
-async function searchGifts(person) {
-    const query = q("wish_" + person).value.trim();
-    if (!query) return;
-
-    const results = [
-        {
-            title: query + " Premium",
-            img: "https://images.unsplash.com/photo-1607082349566-187b3f3c4a26",
-            link: "https://www.google.com/search?q=" + query
-        },
-        {
-            title: "Melhor " + query,
-            img: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-            link: "https://www.google.com/search?q=" + query
-        }
-    ];
-
-    wishlists[person].push(...results);
-
-    renderWishlist(person);
-}
-
-function renderWishlist(person) {
-    const div = q("wishlist_" + person);
-    div.innerHTML = "";
-
-    wishlists[person].forEach(item => {
-        const box = document.createElement("div");
-        box.className = "gift-item";
-
-        box.innerHTML = `
-            <img src="${item.img}">
-            <div>
-                <strong>${item.title}</strong><br>
-                <a href="${item.link}" target="_blank">Ver</a>
-            </div>
-        `;
-
-        div.appendChild(box);
-    });
-}
-
-/* AUTO-LOAD DO GRUPO */
-window.onload = () => {
-    const saved = JSON.parse(localStorage.getItem("lastGroup") || "{}");
-    if (saved.names && saved.mapping) {
-        names = saved.names;
-        mapping = saved.mapping;
-        names.forEach(n => wishlists[n] = []);
-
-        setupPanels(names, mapping);
-
-        q("setup").classList.add("hide");
-        q("panelList").classList.remove("hide");
-    }
+  renderPanels(names);
 };
+
+// -----------------------------
+// PAINÉIS INDIVIDUAIS
+// -----------------------------
+function renderPanels(names) {
+  const container = document.getElementById("peopleList");
+  const panels = document.getElementById("peoplePanels");
+
+  container.innerHTML = "";
+  panels.innerHTML = "";
+
+  names.forEach(name => {
+    const btn = document.createElement("button");
+    btn.className = "person-btn";
+    btn.textContent = name;
+
+    const panel = document.createElement("div");
+    panel.className = "panel";
+    panel.innerHTML = `
+      <h3>${name}</h3>
+
+      <label>Buscar presente</label>
+      <input placeholder="Ex: perfume, fone, camisa">
+
+      <div class="suggest-grid"></div>
+    `;
+
+    btn.onclick = () => {
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      panel.classList.add("active");
+    };
+
+    // Busca automática
+    const input = panel.querySelector("input");
+    const grid = panel.querySelector(".suggest-grid");
+
+    input.oninput = async () => {
+      const q = input.value.trim();
+      grid.innerHTML = "";
+      if (q.length < 2) return;
+
+      const results = await smartSearch(q);
+
+      if (results.length === 0) {
+        grid.innerHTML = `<p class="small muted">Nenhum item encontrado.</p>`;
+        return;
+      }
+
+      results.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "suggest-card";
+        card.innerHTML = `
+          <img src="${r.img}">
+          <div class="title">${r.title}</div>
+          <a href="${r.link}" target="_blank">Ver mais</a>
+        `;
+        grid.appendChild(card);
+      });
+    };
+
+    container.appendChild(btn);
+    panels.appendChild(panel);
+  });
+}
