@@ -1,62 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Amigo Oculto — Sorteio Secreto & Wishlist</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigo Secreto - Premium</title>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="wrap">
-    <header class="topbar">
-      <h1>🎁 Amigo Oculto</h1>
-      <p class="subtitle">Crie grupos, gere links secretos e monte sua wishlist com busca automática.</p>
-    </header>
 
-    <section id="setup" class="card">
-      <h2>Criar grupo</h2>
-      <label>Nome do grupo</label>
-      <input id="groupName" placeholder="Ex: Amigo Oculto da Firma">
+<div class="container">
 
-      <label>Participantes (um por linha)</label>
-      <textarea id="participants" rows="6" placeholder="Maria
-João
-Ana
-Carlos"></textarea>
+    <!-- TELA DE CRIAÇÃO DO GRUPO -->
+    <section id="setup">
+        <h1>🎁 Amigo Secreto</h1>
+        <p>Crie seu grupo e adicione os participantes</p>
 
-      <div class="row">
-        <div class="col">
-          <label>Restrição (opcional)</label>
-          <input id="restriction" placeholder="ex: não permitir que parceiros se tirem">
+        <div class="input-box">
+            <input type="text" id="nameInput" placeholder="Nome do participante">
+            <button onclick="addName()">Adicionar</button>
         </div>
-        <div class="col actions">
-          <button id="btnCreate" class="primary">Gerar links secretos</button>
-        </div>
-      </div>
 
-      <div id="linksArea" class="links hide">
-        <h3>Links gerados — envie para cada participante</h3>
-        <ul id="tokenList" class="token-list"></ul>
-        <div class="links-actions">
-          <button id="btnCopyAll">Copiar todos</button>
-          <button id="btnDownloadZip">Baixar ZIP</button>
-        </div>
-      </div>
+        <ul id="nameList"></ul>
+
+        <button id="startBtn" onclick="startDraw()">Iniciar Sorteio</button>
     </section>
 
-    <section id="panelList" class="card hide">
-      <h2>Painéis individuais</h2>
-      <p class="small">Clique no nome para abrir o painel da pessoa (mobile friendly).</p>
-      <div id="peopleList" class="people-list"></div>
-
-      <div id="peoplePanels" class="panels"></div>
+    <!-- LISTA DE PAINÉIS -->
+    <section id="panelList" class="hide">
+        <h2>Participantes</h2>
+        <div id="peopleButtons"></div>
     </section>
 
-    <footer class="card small center">
-      Desenvolvido — Versão Demo. Para publicar: envie esses arquivos ao seu repositório GitHub e ative GitHub Pages.
-    </footer>
-  </main>
+    <!-- PAINÉIS INDIVIDUAIS GERADOS VIA JS -->
+    <div id="panels"></div>
 
-  <script src="script.js"></script>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
