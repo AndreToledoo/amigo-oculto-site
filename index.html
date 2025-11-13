@@ -1,61 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🎁 Amigo Oculto — Sorteio + Wishlist</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigo Oculto</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <main class="wrap">
-
-    <header class="topbar">
-      <h1>🎁 Amigo Oculto</h1>
-      <p class="subtitle">Crie grupos, gere links secretos e monte wishlists com buscas inteligentes.</p>
+    <header>
+        <h1>🎁 Amigo Oculto</h1>
+        <input type="text" id="search" placeholder="Buscar presentes, lojas ou ideias...">
     </header>
 
-    <!-- Criar Grupo -->
-    <section id="setup" class="card">
-      <h2>Criar Grupo</h2>
+    <main>
+        <!-- Lista de sugestões -->
+        <section id="sugestoes-section">
+            <h2>Sugestões de Presentes</h2>
+            <div id="sugestoes" class="grid"></div>
+        </section>
 
-      <label>Nome do grupo</label>
-      <input id="groupName" placeholder="Ex: Amigo Oculto 2025">
+        <!-- Wishlist -->
+        <section id="wishlist-section">
+            <h2>Lista de Desejos</h2>
+            <div id="wishlist" class="grid"></div>
+        </section>
 
-      <label>Participantes (um por linha)</label>
-      <textarea id="participants" rows="6" placeholder="Maria
-João
-Ana
-Carlos"></textarea>
+        <!-- Roleta -->
+        <section id="roleta-section">
+            <h2>Sorteio</h2>
+            <button id="btn-sortear">Sortear Amigo</button>
+            <p id="resultado-sorteio"></p>
+        </section>
 
-      <button id="btnCreate" class="primary">Gerar Links Secretos</button>
+        <!-- Painel de pessoas -->
+        <section id="pessoas-section">
+            <h2>Pessoas Participantes</h2>
+            <div id="pessoas"class="grid"></div>
+        </section>
+    </main>
 
-      <div id="linksArea" class="links hide">
-        <h3>Links gerados — envie para cada pessoa:</h3>
-
-        <ul id="tokenList" class="token-list"></ul>
-
-        <div class="links-actions">
-          <button id="btnCopyAll">Copiar tudo</button>
-          <button id="btnDownloadZip">Baixar ZIP</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Paineis -->
-    <section id="panelList" class="card hide">
-      <h2>Painéis Individuais</h2>
-      <p class="small">Toque no nome para abrir o painel da pessoa:</p>
-
-      <div id="peopleList" class="people-list"></div>
-      <div id="peoplePanels" class="panels"></div>
-    </section>
-
-    <footer class="card small center">
-      Desenvolvido — Sistema Moderno (Versão Premium Demo).
+    <footer>
+        <p>Feito com ❤️ para seu Amigo Oculto</p>
     </footer>
-  </main>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
