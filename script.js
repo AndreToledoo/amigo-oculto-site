@@ -1,124 +1,100 @@
-// -----------------------------
-// UTILIDADES
-// -----------------------------
-function uid() {
-  return Math.random().toString(36).substring(2, 10);
-}
+// ------------------------------
+// DADOS FIXOS DO SITE
+// ------------------------------
 
-// Simulação de busca MUITO MELHORADA
-async function smartSearch(query) {
-  const keywords = query.toLowerCase().split(" ");
+const sugestoes = [
+    { nome: "Relógio Minimalista", img: "https://i.imgur.com/7yUVEeC.png" },
+    { nome: "Kit de Perfume", img: "https://i.imgur.com/HG2ek8E.png" },
+    { nome: "Fone Bluetooth", img: "https://i.imgur.com/JrT8PqB.png" },
+    { nome: "Carteira Masculina", img: "https://i.imgur.com/gzdZ4n2.png" },
+    { nome: "Kit Barbeiro", img: "https://i.imgur.com/tvUL6Gu.png" }
+];
 
-  const items = [
-    { title: "Perfume Importado", img:"https://picsum.photos/250?1", link:"#", tags:["perfume","cheiro","importado"] },
-    { title: "Fone Bluetooth", img:"https://picsum.photos/250?2", link:"#", tags:["fone","audio","musica"] },
-    { title: "Camisa Premium", img:"https://picsum.photos/250?3", link:"#", tags:["camisa","roupa","moda"] },
-    { title: "Relógio Digital", img:"https://picsum.photos/250?4", link:"#", tags:["relogio","acessório"] },
-    { title: "Air Fryer Smart", img:"https://picsum.photos/250?5", link:"#", tags:["cozinha","airfryer"] },
-  ];
+const pessoas = [
+    "André",
+    "João",
+    "Pedro",
+    "Lucas",
+    "Maria",
+];
 
-  // Rankeamento simples por relevância
-  return items
-    .map(i => {
-      let score = 0;
-      keywords.forEach(k => {
-        if (i.title.toLowerCase().includes(k)) score += 2;
-        if (i.tags.includes(k)) score += 3;
-      });
-      return { ...i, score };
-    })
-    .filter(i => i.score > 0)
-    .sort((a,b) => b.score - a.score);
-}
+// ------------------------------
+// RENDERIZA SUGESTÕES
+// ------------------------------
 
-// -----------------------------
-// CRIAR GRUPO E LINKS
-// -----------------------------
-document.getElementById("btnCreate").onclick = () => {
-  const names = document.getElementById("participants").value
-    .split("\n")
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
+const sugestoesDiv = document.getElementById("sugestoes");
 
-  const list = document.getElementById("tokenList");
-  list.innerHTML = "";
-
-  names.forEach(name => {
-    const token = uid();
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${name}</strong>
-      <span>${location.href}?u=${token}</span>
-    `;
-    list.appendChild(li);
-  });
-
-  document.getElementById("linksArea").classList.remove("hide");
-  document.getElementById("panelList").classList.remove("hide");
-
-  renderPanels(names);
-};
-
-// -----------------------------
-// PAINÉIS INDIVIDUAIS
-// -----------------------------
-function renderPanels(names) {
-  const container = document.getElementById("peopleList");
-  const panels = document.getElementById("peoplePanels");
-
-  container.innerHTML = "";
-  panels.innerHTML = "";
-
-  names.forEach(name => {
-    const btn = document.createElement("button");
-    btn.className = "person-btn";
-    btn.textContent = name;
-
-    const panel = document.createElement("div");
-    panel.className = "panel";
-    panel.innerHTML = `
-      <h3>${name}</h3>
-
-      <label>Buscar presente</label>
-      <input placeholder="Ex: perfume, fone, camisa">
-
-      <div class="suggest-grid"></div>
-    `;
-
-    btn.onclick = () => {
-      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-      panel.classList.add("active");
-    };
-
-    // Busca automática
-    const input = panel.querySelector("input");
-    const grid = panel.querySelector(".suggest-grid");
-
-    input.oninput = async () => {
-      const q = input.value.trim();
-      grid.innerHTML = "";
-      if (q.length < 2) return;
-
-      const results = await smartSearch(q);
-
-      if (results.length === 0) {
-        grid.innerHTML = `<p class="small muted">Nenhum item encontrado.</p>`;
-        return;
-      }
-
-      results.forEach(r => {
+function renderSugestoes(lista) {
+    sugestoesDiv.innerHTML = "";
+    lista.forEach(item => {
         const card = document.createElement("div");
-        card.className = "suggest-card";
+        card.className = "card";
         card.innerHTML = `
-          <img src="${r.img}">
-          <div class="title">${r.title}</div>
-          <a href="${r.link}" target="_blank">Ver mais</a>
+            <img src="${item.img}">
+            <p>${item.nome}</p>
+            <button onclick="addWishlist('${item.nome}', '${item.img}')">Adicionar</button>
         `;
-        grid.appendChild(card);
-      });
-    };
-
-    container.appendChild(btn);
-    panels.appendChild(panel);
-  });
+        sugestoesDiv.appendChild(card);
+    });
 }
+
+renderSugestoes(sugestoes);
+
+// ------------------------------
+// BUSCA
+// ------------------------------
+
+document.getElementById("search").addEventListener("input", (e) => {
+    const valor = e.target.value.toLowerCase();
+    const filtrados = sugestoes.filter(s => s.nome.toLowerCase().includes(valor));
+    renderSugestoes(filtrados);
+});
+
+// ------------------------------
+// WISHLIST
+// ------------------------------
+
+let wishlist = [];
+
+const wishlistDiv = document.getElementById("wishlist");
+
+function addWishlist(nome, img) {
+    wishlist.push({ nome, img });
+    renderWishlist();
+}
+
+function renderWishlist() {
+    wishlistDiv.innerHTML = "";
+    wishlist.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <img src="${item.img}">
+            <p>${item.nome}</p>
+        `;
+        wishlistDiv.appendChild(card);
+    });
+}
+
+// ------------------------------
+// PESSOAS
+// ------------------------------
+
+const pessoasDiv = document.getElementById("pessoas");
+
+pessoas.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<p>${p}</p>`;
+    pessoasDiv.appendChild(card);
+});
+
+// ------------------------------
+// ROLETA DE SORTEIO
+// ------------------------------
+
+document.getElementById("btn-sortear").onclick = () => {
+    const escolhido = pessoas[Math.floor(Math.random() * pessoas.length)];
+    document.getElementById("resultado-sorteio").innerText =
+        "Seu amigo oculto é: " + escolhido + " 🎉";
+};
