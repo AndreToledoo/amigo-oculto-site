@@ -1,79 +1,144 @@
+/* Define as cores principais para o tema escuro */
+:root {
+    --cor-fundo: #121212;
+    --cor-container: #1e1e1e;
+    --cor-texto: #e0e0e0;
+    --cor-primaria: #03dac6; /* Um verde/ciano vibrante */
+    --cor-primaria-hover: #01a896;
+    --cor-borda: #333;
+    --cor-fundo-input: #2a2a2a;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    line-height: 1.6;
 }
 
 .container {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background-color: var(--cor-container);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 500px;
     text-align: center;
+    border: 1px solid var(--cor-borda);
+    
+    /* Animação de entrada */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInContainer 0.6s ease-out forwards;
+}
+
+@keyframes fadeInContainer {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h1 {
-    color: #00796b; /* Um tom de verde */
+    /* Efeito de gradiente no texto */
+    background: linear-gradient(45deg, var(--cor-primaria), #00c6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
 }
 
 p {
-    font-size: 0.9rem;
-    color: #555;
+    font-size: 1rem;
+    color: #aaa; /* Cinza mais claro para subtexto */
     margin-bottom: 1.5rem;
 }
 
 textarea {
     width: 100%;
-    box-sizing: border-box; /* Garante que o padding não quebre o layout */
+    box-sizing: border-box;
     padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 1px solid var(--cor-borda);
+    background-color: var(--cor-fundo-input);
+    color: var(--cor-texto);
+    border-radius: 8px;
     font-size: 1rem;
     line-height: 1.5;
     margin-bottom: 1.5rem;
+    resize: vertical; /* Permite redimensionar só verticalmente */
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.3);
 }
 
 button {
-    background-color: #00897b; /* Verde mais forte */
-    color: white;
+    background-color: var(--cor-primaria);
+    color: #121212; /* Texto escuro no botão claro */
     border: none;
-    padding: 0.8rem 1.5rem;
+    padding: 0.9rem 1.8rem;
     font-size: 1.1rem;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    width: 100%;
 }
 
 button:hover {
-    background-color: #00695c;
+    background-color: var(--cor-primaria-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(3, 218, 198, 0.2);
 }
 
 #resultado {
     margin-top: 1.5rem;
     text-align: left;
-    background-color: #f9f9f9;
+    background-color: var(--cor-fundo-input);
     padding: 1rem;
-    border-radius: 5px;
-    border: 1px dashed #ddd;
+    border-radius: 8px;
+    border: 1px dashed var(--cor-borda);
     font-size: 1.1rem;
     line-height: 1.8;
 }
 
+/* Animação para cada item do resultado */
 #resultado div {
-    padding: 5px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    opacity: 0; /* Começa invisível */
+    animation: fadeInItem 0.5s ease-out forwards;
+}
+
+#resultado div:last-child {
+    border-bottom: none;
+}
+
+#resultado div strong {
+    color: var(--cor-primaria);
+}
+
+@keyframes fadeInItem {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* Estilo para erros */
 .erro {
-    color: #d32f2f;
+    color: #ff5252;
     font-weight: bold;
+    animation: fadeInItem 0.5s ease-out forwards;
 }
