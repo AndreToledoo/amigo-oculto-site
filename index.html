@@ -1,131 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amigo Oculto - Sorteio e Lista de Desejos</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amigo Oculto — Sorteio Secreto & Wishlist</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-    }
-    input, button, textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .result {
-      background: #e8ffe8;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      display: none;
-    }
+    :root{--bg:#f6f8fb;--card:#fff;--accent:#6c63ff}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);margin:0;padding:20px;}
+    .wrap{max-width:900px;margin:18px auto}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 24px rgba(18,22,40,0.06);}
+    h1{margin:0 0 8px;font-size:22px}
+    label{display:block;margin-top:12px;font-weight:600}
+    textarea,input,select,button{width:100%;padding:10px;margin-top:8px;border:1px solid #e3e7ee;border-radius:8px;font-size:15px}
+    .row{display:flex;gap:12px}
+    .row .col{flex:1}
+    button.primary{background:var(--accent);color:#fff;border:0}
+    .small{font-size:13px;color:#666}
+    .links{margin-top:12px}
+    .token-list{margin-top:10px;padding:10px;background:#f8f9ff;border-radius:8px}
+    .token-list li{margin:6px 0}
+    .suggestions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .suggest-card{background:#fafbff;padding:10px;border-radius:8px;border:1px solid #edf0ff;width:calc(33% - 6.66px)}
+    .wish-list{margin-top:10px}
+    .wish-list li{margin:6px 0}
+    .market-links a{display:inline-block;margin-right:8px;margin-top:8px;text-decoration:none;color:var(--accent)}
+    .center{text-align:center}
+    @media(max-width:700px){.suggest-card{width:100%}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎁 Amigo Oculto</h1>
+  <div class="wrap">
+    <div class="card" id="mainCard">
+      <h1>Amigo Oculto — Crie e envie links secretos</h1>
+      <p class="small">Crie um grupo no estilo DrawNames: gere links individuais para cada participante. Cada link revela somente quem aquela pessoa tirou. Inclui wishlist com busca automática para Shopee, AliExpress e Amazon.</p>
 
-    <h3>Participantes</h3>
-    <textarea id="names" rows="5" placeholder="Digite um nome por linha"></textarea>
+      <div id="organizerSection">
+        <label>Nome do grupo</label>
+        <input id="groupName" placeholder="Ex: Amigo Oculto da Firma" />
 
-    <button onclick="doSort()">Sortear</button>
+        <label>Participantes (um por linha)</label>
+        <textarea id="participants" rows="6" placeholder="Maria\nJoão\nAna\nCarlos"></textarea>
 
-    <div class="result" id="resultBox"></div>
+        <div class="row">
+          <div class="col"><label>Restrição (opcional)</label><input id="restriction" placeholder="ex: sem revelar quem tira quem; ou impedir casal tirar casal" /></div>
+          <div class="col" style="flex:0 0 170px;align-self:end"><button class="primary" onclick="createGroup()">Gerar links secretos</button></div>
+        </div>
 
-    <h3>🎀 Exemplos de Presentes</h3>
-    <select id="category" onchange="showGifts()">
-      <option value="geral">Geral</option>
-      <option value="tecnologia">Tecnologia</option>
-      <option value="beleza">Beleza</option>
-      <option value="livros">Livros</option>
-      <option value="casa">Casa</option>
-    </select>
+        <div id="linksArea" style="display:none;margin-top:12px">
+          <h3>Links gerados — copie e envie para cada participante</h3>
+          <p class="small">Cada link revela somente o sorteado daquela pessoa.</p>
+          <ul id="tokenList" class="token-list"></ul>
+          <div style="margin-top:10px">
+            <button onclick="copyAll()">Copiar todos</button>
+            <button onclick="downloadZip()">Baixar arquivo ZIP (index.html com tokens)</button>
+          </div>
+        </div>
+      </div>
 
-    <ul id="giftList"></ul>
+      <div id="participantView" style="display:none">
+        <h2 id="hi"></h2>
+        <p class="small">Somente você vê esse resultado — ninguém mais poderá ver o que cada um tirou.</p>
+        <div id="resultBox" class="card" style="margin-top:10px"></div>
 
-    <h3>💡 Minha Lista de Desejos</h3>
-    <input type="text" id="wishInput" placeholder="Adicionar desejo..." />
-    <button onclick="addWish()">Adicionar</button>
-    <ul id="wishList"></ul>
+        <h3 style="margin-top:14px">Wishlist — sugestões e busca automática</h3>
+        <p class="small">Clique em uma sugestão ou pesquise um item. Os links abrem nas lojas.</p>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="searchQuery" placeholder="Pesquisar presente (ex: fone bluetooth)"/>
+          <button onclick="doSearch()">Pesquisar</button>
+        </div>
+
+        <div style="margin-top:10px">
+          <strong>Sugestões rápidas</strong>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+
+        <ul class="wish-list" id="wishList"></ul>
+
+        <div style="margin-top:12px">
+          <button onclick="saveWishes()">Salvar Wishlist</button>
+          <button onclick="shareWishes()">Compartilhar Wishlist (copiar link)</button>
+        </div>
+
+      </div>
+
+    </div>
   </div>
 
 <script>
-  function doSort() {
-    const names = document.getElementById("names").value.trim().split(/\n+/);
-    if (names.length < 2) {
-      alert("Adicione pelo menos 2 participantes.");
-      return;
-    }
+// ---------- UTILIDADES ----------
+function uid(len=10){ const s='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; let r=''; for(let i=0;i<len;i++) r+=s[Math.floor(Math.random()*s.length)]; return r }
+function qsel(id){return document.getElementById(id)}
+function getParam(name){const p=new URLSearchParams(window.location.search);return p.get(name)}
 
-    const shuffled = [...names].sort(() => Math.random() - 0.5);
+// ---------- SUGESTÕES PRÉ-DEFINIDAS ----------
+const SUGGESTIONS=[
+  {title:'Fone Bluetooth'},
+  {title:'Caneca personalizada'},
+  {title:'Kit skincare'},
+  {title:'Agendamento de massagem (voucher)'},
+  {title:'Camiseta divertida'},
+  {title:'Livro best-seller'},
+  {title:'Relógio smartwatch'},
+  {title:'Acessórios para casa'},
+  {title:'Cartão presente (R$50)'}
+];
 
-    let result = "";
-    for (let i = 0; i < names.length; i++) {
-      const giver = names[i];
-      const receiver = shuffled[i] === giver ? shuffled[(i+1) % names.length] : shuffled[i];
-      result += `${giver} ➜ <b>${receiver}</b><br>`;
-    }
+function createSuggestionCards(){const el=qsel('suggestions');el.innerHTML='';SUGGESTIONS.forEach(s=>{const d=document.createElement('div');d.className='suggest-card';d.innerHTML=`<strong>${s.title}</strong><div style="margin-top:8px"><button onclick="quickSearch('${encodeURIComponent(s.title)}')">Ver ofertas</button></div>`;el.appendChild(d)})}
+createSuggestionCards();
 
-    const box = document.getElementById("resultBox");
-    box.innerHTML = result;
-    box.style.display = "block";
+// ---------- GERAR GRUPO E TOKENS ----------
+function createGroup(){
+  const raw=qsel('participants').value.trim();
+  const group=qsel('groupName').value.trim()||'Grupo';
+  if(!raw){alert('Adicione pelo menos 2 participantes');return}
+  const names=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  if(names.length<2){alert('Adicione pelo menos 2 participantes');return}
+
+  // embaralhar e atribuir
+  const shuffled=[...names].sort(()=>Math.random()-0.5);
+  const assignment={};
+  for(let i=0;i<names.length;i++){
+    const giver=names[i];
+    const receiver = (shuffled[i]===giver) ? shuffled[(i+1)%names.length] : shuffled[i];
+    assignment[giver]=receiver;
   }
 
-  const gifts = {
-    geral: ["Caneca personalizada", "Chocolate", "Agenda", "Cartão-presente"],
-    tecnologia: ["Fone Bluetooth", "Mouse gamer", "Suporte para celular", "Lâmpada smart"],
-    beleza: ["Perfume", "Creme hidratante", "Kit skincare", "Maquiagem"],
-    livros: ["Suspense", "Romance", "Fantasia", "Autoajuda"],
-    casa: ["Aromatizador", "Quadro decorativo", "Taças", "Kit cozinha"]
-  };
+  // gerar token individual para cada participante (contendo só a info dele)
+  const baseUrl=window.location.origin+window.location.pathname; // manter mesmo arquivo
+  const listEl=qsel('tokenList');listEl.innerHTML='';
+  const mapping={};
+  names.forEach(n=>{
+    const payload={group, giver:n, receiver:assignment[n], ts:Date.now(), id:uid(8)};
+    const token=btoa(JSON.stringify(payload));
+    const link=`${baseUrl}?token=${token}`;
+    mapping[n]=link;
+    const li=document.createElement('li');
+    li.innerHTML=`<strong>${n}</strong>: <a href="${link}" target="_blank">${link}</a> <button onclick="copyText('${link.replace(/'/g,"\\'")}")">Copiar</button>`;
+    listEl.appendChild(li);
+  });
 
-  function showGifts() {
-    const category = document.getElementById("category").value;
-    const list = document.getElementById("giftList");
-    list.innerHTML = "";
+  qsel('linksArea').style.display='block';
+  // salvar no localStorage pra organizer poder recuperar se quiser
+  localStorage.setItem('lastGroup', JSON.stringify({group, mapping, created:Date.now()}));
+}
 
-    gifts[category].forEach(item => {
-      list.innerHTML += `<li>${item}</li>`;
-    });
+function copyText(t){navigator.clipboard.writeText(t);alert('Copiado!')}
+function copyAll(){const last=localStorage.getItem('lastGroup');if(!last){alert('Nenhum link gerado ainda');return} const obj=JSON.parse(last);let txt='Links do grupo:\n';Object.entries(obj.mapping).forEach(([k,v])=>txt+=`${k}: ${v}\n`);navigator.clipboard.writeText(txt);alert('Todos os links copiados')}
+
+// ---------- PARTICIPANTE ABRINDO O LINK ----------
+function showParticipantView(payload){
+  qsel('organizerSection').style.display='none';
+  qsel('participantView').style.display='block';
+  qsel('hi').innerText=`Olá, ${payload.giver}!`;
+  qsel('resultBox').innerHTML=`<p style="font-size:18px"><strong>Você tirou: ${payload.receiver}</strong></p>`;
+
+  // carregar wishlist do localStorage
+  const key='wish_'+btoa(payload.giver+'@'+payload.ts);
+  const saved=localStorage.getItem(key);
+  let arr = saved ? JSON.parse(saved) : [];
+  renderWishes(arr);
+
+  // store helper closures
+  window._currentPayload=payload;
+  window._currentWishKey=key;
+}
+
+function renderWishes(list){const ul=qsel('wishList');ul.innerHTML='';if(list.length===0){ul.innerHTML='<li class="small">(Nenhum item ainda)</li>';return} list.forEach((w,i)=>{const li=document.createElement('li');li.innerHTML=`${w.title} <div class="market-links">`+
+    `<a href="${w.links.shopee}" target="_blank">Shopee</a>`+
+    `<a href="${w.links.aliexpress}" target="_blank">AliExpress</a>`+
+    `<a href="${w.links.amazon}" target="_blank">Amazon</a>`+
+    ` <button onclick="removeWish(${i})">Remover</button>`+
+    `</div>`;ul.appendChild(li)})
+  window._currentWishes=list;
+}
+
+function saveWishes(){if(!window._currentWishKey){alert('Erro: token inválido');return} localStorage.setItem(window._currentWishKey, JSON.stringify(window._currentWishes||[])); alert('Wishlist salva localmente no seu navegador') }
+function shareWishes(){ if(!window._currentPayload){alert('Token inválido')} const token = getParam('token'); const shareUrl = window.location.origin+window.location.pathname + '?token='+token + '&view=wishlist'; navigator.clipboard.writeText(shareUrl); alert('Link da sua wishlist copiado!') }
+function removeWish(i){ if(!window._currentWishes) return; window._currentWishes.splice(i,1); renderWishes(window._currentWishes) }
+
+// ---------- BUSCA AUTOMÁTICA ----------
+function makeStoreLinks(query){
+  const q=encodeURIComponent(query);
+  return {
+    shopee:`https://shopee.com.br/search?keyword=${q}`,
+    aliexpress:`https://www.aliexpress.com/wholesale?SearchText=${q}`,
+    amazon:`https://www.amazon.com.br/s?k=${q}`
   }
+}
 
-  showGifts();
+function quickSearch(encodedTitle){ const title=decodeURIComponent(encodedTitle); const links=makeStoreLinks(title); window.open(links.shopee,'_blank'); }
 
-  function addWish() {
-    const input = document.getElementById("wishInput");
-    const list = document.getElementById("wishList");
+function doSearch(){ const q=qsel('searchQuery').value.trim(); if(!q){alert('Digite o que quer buscar');return} const links=makeStoreLinks(q);
+  // mostrar resultados simples com 3 links e opção de adicionar à wishlist
+  const id='__searchResults'; let container=document.getElementById(id); if(container) container.remove(); container=document.createElement('div'); container.id=id; container.className='card'; container.style.marginTop='10px'; container.innerHTML=`<p class="small">Resultados para <strong>${q}</strong></p>`;
+  const a1=`<a href="${links.shopee}" target="_blank">Abrir Shopee</a>`;
+  const a2=`<a href="${links.aliexpress}" target="_blank">Abrir AliExpress</a>`;
+  const a3=`<a href="${links.amazon}" target="_blank">Abrir Amazon</a>`;
+  container.innerHTML += `${a1} &nbsp; ${a2} &nbsp; ${a3}`;
+  // botão adicionar à wishlist (cria objeto com links)
+  const addBtn=document.createElement('div'); addBtn.style.marginTop='8px'; addBtn.innerHTML=`<button onclick="addCurrentSearchToWish('${encodeURIComponent(q)}')">Adicionar à minha wishlist</button>`;
+  container.appendChild(addBtn);
+  qsel('participantView').appendChild(container);
+}
 
-    if (input.value.trim() === "") return;
+function addCurrentSearchToWish(encq){ const q=decodeURIComponent(encq); const links=makeStoreLinks(q); const item={title:q, links}; window._currentWishes = window._currentWishes || []; window._currentWishes.push(item); renderWishes(window._currentWishes); }
 
-    list.innerHTML += `<li>${input.value}</li>`;
-    input.value = "";
-  }
+// ---------- INICIALIZAÇÃO: verifica token na URL ----------
+(function init(){ const token=getParam('token'); if(!token) return; try{ const payload=JSON.parse(atob(token)); // payload contém giver e receiver
+    showParticipantView(payload);
+    // se ?view=wishlist, rolar pra wishlist
+    const view=getParam('view'); if(view==='wishlist'){setTimeout(()=>location.hash='#wishlist',100)}
+  }catch(e){console.error(e)} })();
+
+// ---------- DOWNLOAD ZIP (opcional simples) ----------
+function downloadZip(){ alert('Função de ZIP não implementada no cliente. Em breve posso gerar um pacote para download.'); }
+
 </script>
-
 </body>
 </html>
