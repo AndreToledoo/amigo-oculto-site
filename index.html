@@ -8,42 +8,45 @@
 </head>
 
 <body>
-    <header>
-        <h1>🎁 Amigo Oculto</h1>
-        <input type="text" id="search" placeholder="Buscar presentes, lojas ou ideias...">
-    </header>
 
-    <main>
-        <!-- Lista de sugestões -->
-        <section id="sugestoes-section">
-            <h2>Sugestões de Presentes</h2>
-            <div id="sugestoes" class="grid"></div>
-        </section>
+<header class="header">
+    <div class="logo">🎁 Amigo Oculto</div>
+    <input type="text" id="busca" placeholder="Buscar presentes, lojas ou ideias...">
+</header>
 
-        <!-- Wishlist -->
-        <section id="wishlist-section">
-            <h2>Lista de Desejos</h2>
-            <div id="wishlist" class="grid"></div>
-        </section>
+<main class="container">
 
-        <!-- Roleta -->
-        <section id="roleta-section">
-            <h2>Sorteio</h2>
-            <button id="btn-sortear">Sortear Amigo</button>
-            <p id="resultado-sorteio"></p>
-        </section>
+    <!-- Sugestões -->
+    <section>
+        <h2>Sugestões de Presentes</h2>
+        <div id="sugestoes" class="grid"></div>
+    </section>
 
-        <!-- Painel de pessoas -->
-        <section id="pessoas-section">
-            <h2>Pessoas Participantes</h2>
-            <div id="pessoas"class="grid"></div>
-        </section>
-    </main>
+    <!-- Wishlist -->
+    <section>
+        <h2>Lista de Desejos</h2>
+        <div id="wishlist" class="grid"></div>
+    </section>
 
-    <footer>
-        <p>Feito com ❤️ para seu Amigo Oculto</p>
-    </footer>
+    <!-- Sorteio -->
+    <section>
+        <h2>Sorteio</h2>
+        <button onclick="sortear()">Sortear Amigo</button>
+        <p id="resultado-sorteio"></p>
+    </section>
 
-    <script src="script.js"></script>
+    <!-- Participantes -->
+    <section>
+        <h2>Pessoas Participantes</h2>
+        <ul id="participantes"></ul>
+    </section>
+
+</main>
+
+<footer>
+    Feito com ❤️ para seu Amigo Oculto
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
