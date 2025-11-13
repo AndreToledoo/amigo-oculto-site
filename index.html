@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amigo Oculto - Sorteio e Lista de Desejos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    input, button, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      background: #e8ffe8;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Amigo Oculto</h1>
+
+    <h3>Participantes</h3>
+    <textarea id="names" rows="5" placeholder="Digite um nome por linha"></textarea>
+
+    <button onclick="doSort()">Sortear</button>
+
+    <div class="result" id="resultBox"></div>
+
+    <h3>🎀 Exemplos de Presentes</h3>
+    <select id="category" onchange="showGifts()">
+      <option value="geral">Geral</option>
+      <option value="tecnologia">Tecnologia</option>
+      <option value="beleza">Beleza</option>
+      <option value="livros">Livros</option>
+      <option value="casa">Casa</option>
+    </select>
+
+    <ul id="giftList"></ul>
+
+    <h3>💡 Minha Lista de Desejos</h3>
+    <input type="text" id="wishInput" placeholder="Adicionar desejo..." />
+    <button onclick="addWish()">Adicionar</button>
+    <ul id="wishList"></ul>
+  </div>
+
+<script>
+  function doSort() {
+    const names = document.getElementById("names").value.trim().split(/\n+/);
+    if (names.length < 2) {
+      alert("Adicione pelo menos 2 participantes.");
+      return;
+    }
+
+    const shuffled = [...names].sort(() => Math.random() - 0.5);
+
+    let result = "";
+    for (let i = 0; i < names.length; i++) {
+      const giver = names[i];
+      const receiver = shuffled[i] === giver ? shuffled[(i+1) % names.length] : shuffled[i];
+      result += `${giver} ➜ <b>${receiver}</b><br>`;
+    }
+
+    const box = document.getElementById("resultBox");
+    box.innerHTML = result;
+    box.style.display = "block";
+  }
+
+  const gifts = {
+    geral: ["Caneca personalizada", "Chocolate", "Agenda", "Cartão-presente"],
+    tecnologia: ["Fone Bluetooth", "Mouse gamer", "Suporte para celular", "Lâmpada smart"],
+    beleza: ["Perfume", "Creme hidratante", "Kit skincare", "Maquiagem"],
+    livros: ["Suspense", "Romance", "Fantasia", "Autoajuda"],
+    casa: ["Aromatizador", "Quadro decorativo", "Taças", "Kit cozinha"]
+  };
+
+  function showGifts() {
+    const category = document.getElementById("category").value;
+    const list = document.getElementById("giftList");
+    list.innerHTML = "";
+
+    gifts[category].forEach(item => {
+      list.innerHTML += `<li>${item}</li>`;
+    });
+  }
+
+  showGifts();
+
+  function addWish() {
+    const input = document.getElementById("wishInput");
+    const list = document.getElementById("wishList");
+
+    if (input.value.trim() === "") return;
+
+    list.innerHTML += `<li>${input.value}</li>`;
+    input.value = "";
+  }
+</script>
+
+</body>
+</html>
