@@ -1,52 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amigo Oculto</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Sorteio Amigo Oculto</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<header class="header">
-    <div class="logo">🎁 Amigo Oculto</div>
-    <input type="text" id="busca" placeholder="Buscar presentes, lojas ou ideias...">
-</header>
+    <div class="container">
+        <h1>Amigo Oculto</h1>
+        <p>Digite os nomes dos participantes, <strong>um por linha</strong>:</p>
+        
+        <textarea id="nomes" rows="10" placeholder="Ana&#10;Bruno&#10;Carla&#10;Daniel"></textarea>
+        
+        <button id="sortearBtn">Sortear!</button>
+        
+        <h2>Resultado:</h2>
+        <div id="resultado">
+            </div>
+    </div>
 
-<main class="container">
-
-    <!-- Sugestões -->
-    <section>
-        <h2>Sugestões de Presentes</h2>
-        <div id="sugestoes" class="grid"></div>
-    </section>
-
-    <!-- Wishlist -->
-    <section>
-        <h2>Lista de Desejos</h2>
-        <div id="wishlist" class="grid"></div>
-    </section>
-
-    <!-- Sorteio -->
-    <section>
-        <h2>Sorteio</h2>
-        <button onclick="sortear()">Sortear Amigo</button>
-        <p id="resultado-sorteio"></p>
-    </section>
-
-    <!-- Participantes -->
-    <section>
-        <h2>Pessoas Participantes</h2>
-        <ul id="participantes"></ul>
-    </section>
-
-</main>
-
-<footer>
-    Feito com ❤️ para seu Amigo Oculto
-</footer>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
